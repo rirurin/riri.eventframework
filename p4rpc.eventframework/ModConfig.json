@@ -1,0 +1,32 @@
+{
+  "ModId": "p4rpc.eventframework",
+  "ModName": "P4R Event Framework",
+  "ModAuthor": "Rirurin",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Allows for customization of existing events and addition of new events in Persona 4 Revival",
+  "ModDll": "p4rpc.eventframework.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "x86/p4rpc.eventframework.dll",
+  "ModR2RManagedDll64": "x64/p4rpc.eventframework.dll",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "IsLibrary": true,
+  "ReleaseMetadataFileName": "p4rpc.eventframework.ReleaseMetadata.json",
+  "PluginData": {},
+  "IsUniversalMod": false,
+  "ModDependencies": [
+    "P3R.UEToolkit",
+    "p3rpc.essentials",
+    "p3rpc.nativetypes",
+    "Reloaded.Memory.SigScan.ReloadedII",
+    "reloaded.sharedlib.hooks",
+    "SharedScans.Reloaded",
+    "UE.Toolkit.Reloaded"
+  ],
+  "OptionalDependencies": [
+  ],
+  "SupportedAppId": [
+    "p4r.exe"
+  ],
+  "ProjectUrl": ""
+}

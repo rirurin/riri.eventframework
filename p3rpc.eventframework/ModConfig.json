@@ -1,0 +1,31 @@
+{
+  "ModId": "p3rpc.eventframework",
+  "ModName": "P3RE Event Framework",
+  "ModAuthor": "RIrurin",
+  "ModVersion": "1.0.0",
+  "ModDescription": "Allow for customization of existing events and addition of new events in Persona 3 Reload",
+  "ModDll": "p3rpc.eventframework.dll",
+  "ModIcon": "Preview.png",
+  "ModR2RManagedDll32": "x86/p3rpc.eventframework.dll",
+  "ModR2RManagedDll64": "x64/p3rpc.eventframework.dll",
+  "ModNativeDll32": "",
+  "ModNativeDll64": "",
+  "IsLibrary": true,
+  "ReleaseMetadataFileName": "p3rpc.eventframework.ReleaseMetadata.json",
+  "PluginData": {},
+  "IsUniversalMod": false,
+  "ModDependencies": [
+    "P3R.UEToolkit",
+    "p3rpc.essentials",
+    "p3rpc.nativetypes",
+    "Reloaded.Memory.SigScan.ReloadedII",
+    "reloaded.sharedlib.hooks",
+    "SharedScans.Reloaded",
+    "UE.Toolkit.Reloaded"
+  ],
+  "OptionalDependencies": [],
+  "SupportedAppId": [
+    "p3r.exe"
+  ],
+  "ProjectUrl": ""
+}

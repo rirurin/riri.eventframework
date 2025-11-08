@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="p3rpc.nativetypes.Interfaces" Version="1.7.4" />
+    <PackageReference Include="p3rpc.commonmodutils" Version="1.8.0" />
+    <!--<PackageReference Include="UE.Toolkit.Interfaces" Version="1.4.5" />-->
+    <PackageReference Include="YamlDotNet" Version="16.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\UE.Toolkit\UE.Toolkit.Interfaces\UE.Toolkit.Interfaces.csproj" />
+    <!--<ProjectReference Include="D:\projects\p3rpc.commonmodutils\p3rpc.commonmodutils\p3rpc.commonmodutils.csproj" />-->
+    <!--<ProjectReference Include="D:\projects\p3rpc.nativetypes\p3rpc.nativetypes.Interfaces\p3rpc.nativetypes.Interfaces.csproj" />-->
+  </ItemGroup>
+
+</Project>
