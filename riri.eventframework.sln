@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "p4rpc.eventframework", "p4r
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UE.Toolkit.Interfaces", "..\UE.Toolkit\UE.Toolkit.Interfaces\UE.Toolkit.Interfaces.csproj", "{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "p3rpc.commonmodutils", "D:\projects\p3rpc.commonmodutils\p3rpc.commonmodutils\p3rpc.commonmodutils.csproj", "{BB6FDD1D-C2A2-45A8-8F3B-196DC7D1E060}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB6FDD1D-C2A2-45A8-8F3B-196DC7D1E060}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB6FDD1D-C2A2-45A8-8F3B-196DC7D1E060}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB6FDD1D-C2A2-45A8-8F3B-196DC7D1E060}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB6FDD1D-C2A2-45A8-8F3B-196DC7D1E060}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

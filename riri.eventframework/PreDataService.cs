@@ -1,4 +1,5 @@
-﻿using p3rpc.commonmodutils;
+﻿using System.Collections.Concurrent;
+using p3rpc.commonmodutils;
 using p3rpc.nativetypes.Interfaces;
 using riri.eventframework.Game;
 using riri.eventframework.Yaml;
@@ -13,8 +14,8 @@ namespace riri.eventframework
     {
 
         public IGameMethods? _game { get; set; }
-        public Dictionary<uint, PreDataModel> CustomEvtPreDataManaged = new();
-        public Dictionary<uint, PreDataAdapter> CustomEvtPreDataAdapted = new();
+        public ConcurrentDictionary<uint, PreDataModel> CustomEvtPreDataManaged = new();
+        public ConcurrentDictionary<uint, PreDataAdapter> CustomEvtPreDataAdapted = new();
 
         public unsafe PreDataService(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context, modules)
         {
@@ -155,7 +156,7 @@ namespace riri.eventframework
                     }
                 }
                 var preDataHash = UAtlEvtSubsystem.GetEvtPreDataHash((EAtlEvtEventCategoryType)preDataManaged.EventCategoryTypeID, (uint)preDataManaged.EventMajorID, (uint)preDataManaged.EventMinorID);
-                CustomEvtPreDataManaged.Add(preDataHash, preDataManaged);
+                CustomEvtPreDataManaged.TryAdd(preDataHash, preDataManaged);
                 _context._utils.Log($"Registered pre event yaml {preDataManaged.EventCategory}_{preDataManaged.EventMajorID:D3}_{preDataManaged.EventMinorID:D3}_{preDataManaged.EventRank} (hash: 0x{preDataHash:X})");
 
             }

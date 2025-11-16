@@ -1,5 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System.Text;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using p3rpc.commonmodutils;
 using p3rpc.nativetypes.Interfaces;
 using Reloaded.Hooks.Definitions;
@@ -34,27 +34,35 @@ public class Field : ModuleBase<EventContext>
                 Result = (ULevelStreaming*)NewLevel;
             } else
             {
-                // Try to create a new level...
-                FVector OriginLocation = new FVector(0, 0, 0);
-                FRotator OriginRotator = new FRotator(0, 0, 0);
-                byte bSucceeded = 0;
-                FString* StreamPathCopy = (FString*)_context._toolkitObjects.CreateFString(Name.ToString());
-                FString* LevelNameOverride = (FString*)_context._toolkitObjects.CreateFString("");
-                _context._logger.WriteLine($"{StreamPathCopy->ToString()} / {LevelNameOverride->ToString()}");
-                Result = _loadLevelInstance!.Invoke(WorldContextObject, StreamPathCopy, &OriginLocation, &OriginRotator, &bSucceeded, LevelNameOverride);
-                _context._toolkitMemory.Free((nint)StreamPathCopy);
-                _context._toolkitMemory.Free((nint)LevelNameOverride);
-                if (bSucceeded == 1 && Result != null)
+                if (TryCreateNewLevel(WorldContextObject, Name.ToString(), out Result))
                 {
                     _context._logger.WriteLine($"Added level {Name.ToString()} to the level streaming registry: 0x{(nint)Result:X}");
-                    NewLevels.Add(Name.ToString(), (nint)Result);
-                } else
+                    NewLevels.TryAdd(Name.ToString(), (nint)Result);                   
+                }
+                else
                 {
                     _context._logger.WriteLine($"LOADING LEVEL INSTANCE FAILED: {Name.ToString()}");
                 }
             }
         }
         return Result;
+    }
+
+    public unsafe bool TryCreateNewLevel(UObject* WorldContextObject, string Name, [MaybeNullWhen(false)] out ULevelStreaming* Result)
+    {
+        // Try to create a new level...
+        FVector OriginLocation = new FVector(0, 0, 0);
+        FRotator OriginRotator = new FRotator(0, 0, 0);
+        byte bSucceeded = 0;
+        FString* StreamPathCopy = (FString*)_context._toolkitObjects.CreateFString(Name);
+        FString* LevelNameOverride = (FString*)_context._toolkitObjects.CreateFString("");
+        // ULevelStreaming: CurrentState -> TargetState
+        // ECurrentState::Loading -> ETargetState::LoadedVisible
+        // ECurrentState::LoadedVisible -> ETargetState::LoadedVisible
+        Result = _loadLevelInstance!.Invoke(WorldContextObject, StreamPathCopy, &OriginLocation, &OriginRotator, &bSucceeded, LevelNameOverride);
+        _context._toolkitMemory.Free((nint)StreamPathCopy);
+        _context._toolkitMemory.Free((nint)LevelNameOverride);
+        return bSucceeded == 1 && Result != null;
     }
     
     private unsafe delegate void ULevelStreaming_SetShouldBeLoaded(ULevelStreaming* Self, byte bVisible); // vtable + 0x270
@@ -76,10 +84,13 @@ public class Field : ModuleBase<EventContext>
         _unloadStreamingLevel.OriginalFunction(WorldContextObject, Name, LatentInfo, bShouldBlockOnUnload);
         if (NewLevels.TryGetValue(LevelPath, out var NewLevel))
         {
-            _context._utils.Log($"Force hide this! {LevelPath}");
+            _context._utils.Log($"Unloading custom level {LevelPath}");
             var level = (ULevelStreaming*)NewLevel;
             var setShouldLoad = _context._hooks.CreateWrapper<ULevelStreaming_SetShouldBeLoaded>(*(nint*)(*(nint*)level + SetShouldBeLoaded_Offset), out _);
+            // ULevelStreaming: CurrentState -> TargetState
+            // ECurrentState::Unloaded -> ETargetState::Unloaded
             setShouldLoad(level, 0);
+            NewLevels.Remove(LevelPath, out _);
         }
     }
    
@@ -94,7 +105,7 @@ public class Field : ModuleBase<EventContext>
     
     }
     
-    public Dictionary<string, nint> NewLevels = new();
+    public ConcurrentDictionary<string, nint> NewLevels = new();
     
     public unsafe Field(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context,
         modules)
