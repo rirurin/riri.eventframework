@@ -47,6 +47,10 @@ namespace riri.eventframework
             if (model.EventLevel != null) newAdapter.EventLevel = _context._toolkitObjects.CreateFString(model.EventLevel); else errorReporter.MissingParameters.Add("EventLevel");
             if (model.EventSublevels != null) newAdapter.EventSublevels = newAdapter.SublevelHookFromYamlModel(_context._toolkitMemory, _context._toolkitObjects, model); else errorReporter.MissingParameters.Add("EventSublevels");
             if (model.LightScenarioSublevels != null) newAdapter.LightScenarioSublevels = newAdapter.LightScenarioFromYamlModel(_context._toolkitMemory, model); else errorReporter.MissingParameters.Add("LightScenarioSublevels");
+            if (model.DungeonSublevel != null)
+            {
+                newAdapter.DungeonSublevel = newAdapter.DungeonSublevelHookFromYamlModel(_context._toolkitMemory, model.DungeonSublevel);
+            }
             errorReporter.ReportErrors(s => _context._utils.Log(s, LogLevel.Error));
             return (errorReporter.MissingParameters.Count == 0) ? newAdapter : null;
         }
@@ -106,8 +110,8 @@ namespace riri.eventframework
                     EventBGLevels = *(p3rpc.nativetypes.Interfaces.TArray<p3rpc.nativetypes.Interfaces.FString>*)BgLevels.Base(),
                     BGFieldMajorID = Sublevel.BGFieldMajorID,
                     BGFieldMinorID = Sublevel.BGFieldMinorID,
-                    BGFieldSeasonSubLevel = *(p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSeasonSubLevel),
-                    BGFieldSoundSubLevel = *(p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSoundSubLevel),
+                    BGFieldSeasonSubLevel = *(p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSeasonSubLevel!),
+                    BGFieldSoundSubLevel = *(p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSoundSubLevel!),
                 });
                 _memory.Free((nint)BgLevels.Base());
             }

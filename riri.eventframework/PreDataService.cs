@@ -1,15 +1,51 @@
 ﻿using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 using p3rpc.commonmodutils;
 using p3rpc.nativetypes.Interfaces;
 using riri.eventframework.Game;
 using riri.eventframework.Yaml;
 using UE.Toolkit.Core.Types.Unreal.UE5_4_4;
+using HashableInt8 = UE.Toolkit.Core.Types.Unreal.UE5_4_4.HashableInt8;
 
 using FName = p3rpc.nativetypes.Interfaces.FName;
 using FString = p3rpc.nativetypes.Interfaces.FString;
 
 namespace riri.eventframework
 {
+    
+    [StructLayout(LayoutKind.Explicit, Pack = 8, Size = 0x50)]
+    public unsafe struct FBustupFace
+    {
+        [FieldOffset(0x0)] public UE.Toolkit.Core.Types.Unreal.UE5_4_4.TMap<int, FBustupCloth> Faces; // Size: 0x50
+    }
+    
+    [StructLayout(LayoutKind.Explicit, Pack = 8, Size = 0x50)]
+    public unsafe struct FBustupCloth
+    {
+        [FieldOffset(0x0)] public UE.Toolkit.Core.Types.Unreal.UE5_4_4.TMap<int, FBustupParts> Clothes; // Size: 0x50
+    }
+    
+    [StructLayout(LayoutKind.Explicit, Pack = 8, Size = 0x40)]
+    public unsafe struct FBustupParts
+    {
+        [FieldOffset(0x0)] public FString Pose; // Size: 0x10
+        [FieldOffset(0x10)] public ushort EyePartsID; // Size: 0x2
+        [FieldOffset(0x12)] public ushort MouthPartsID; // Size: 0x2
+        [FieldOffset(0x14)] public bool bEyeAnim; // Size: 0x1
+        [FieldOffset(0x14)] public bool bMouthAnim; // Size: 0x1
+        [FieldOffset(0x15)] public byte InBetween; // Size: 0x1
+        [FieldOffset(0x18)] public float EyeX; // Size: 0x4
+        [FieldOffset(0x1C)] public float EyeY; // Size: 0x4
+        [FieldOffset(0x20)] public float MouthX; // Size: 0x4
+        [FieldOffset(0x24)] public float MouthY; // Size: 0x4
+        [FieldOffset(0x28)] public float BlushX; // Size: 0x4
+        [FieldOffset(0x2C)] public float BlushY; // Size: 0x4
+        [FieldOffset(0x30)] public float SweatX; // Size: 0x4
+        [FieldOffset(0x34)] public float SweatY; // Size: 0x4
+        [FieldOffset(0x38)] public float OffsetX; // Size: 0x4
+        [FieldOffset(0x3C)] public float OffsetY; // Size: 0x4
+    }
+    
     public class PreDataService : ModuleBase<EventContext>
     {
 
@@ -19,6 +55,19 @@ namespace riri.eventframework
 
         public unsafe PreDataService(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context, modules)
         {
+            _context._toolkitObjects.OnObjectLoadedByName<UObject>("BustupExistDataAsset", x =>
+            {
+                var CurrentDict = new TMapDynamicDictionary<HashableInt8>(
+                    (UE.Toolkit.Core.Types.Unreal.UE5_4_4.TMap<HashableInt8, byte>*)((nint)x.Self + 0x30),
+                    typeof(FBustupFace),
+                    _context._toolkitMemory);
+                _context._utils.Log($"BustupExistDataAsset: 0x{(nint)x.Self:x}");
+                _context._utils.Log($"Entries: {CurrentDict.Count}");
+                if (CurrentDict.TryGetValue(new HashableInt8(1), out var chara))
+                {
+                    _context._utils.Log($"Got entry 1: 0x{chara:x}");
+                }
+            });
         }
 
         public override void Register()
@@ -74,8 +123,7 @@ namespace riri.eventframework
             // Set Event Level file path
             var EventLevelSource = (hook is { EventLevel: not null } ) switch
             {
-                true => (FString*)hook.EventLevel,
-                false => &original->EventLevel
+                true => (FString*)hook.EventLevel, false => &original->EventLevel
             };
             copy->EventLevel = *(FString*)_context._toolkitObjects.CreateFString(EventLevelSource->ToString());
             // Set Event Sublevels
@@ -104,15 +152,15 @@ namespace riri.eventframework
                         LightScenarioDest.AddValue(*Sublevel.Value);
                     break;
             }
-            // Set Dungeon Sublevels
-            /*
+            // Set Dungeon Sublevels (optional)
             var DungeonSublevelSrc = (hook is { DungeonSublevel: not null }) switch
             {
-                true => hook.DungeonSublevel,
-                false => &original->DungeonSublevel
+                true => hook.DungeonSublevel, false => original != null ? &original->DungeonSublevel : null
             };
-            CopyDungeonSublevelPreData(&copy->DungeonSublevel, DungeonSublevelSrc);
-            */
+            if (DungeonSublevelSrc != null)
+            {
+                CopyDungeonSublevelPreData(&copy->DungeonSublevel, DungeonSublevelSrc);
+            }
         }
 
         private bool TryRegisterPreEventYaml(string path)

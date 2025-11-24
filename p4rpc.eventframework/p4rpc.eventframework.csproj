@@ -44,7 +44,6 @@
 
   <ItemGroup>
   	<ProjectReference Include="..\riri.eventframework\riri.eventframework.csproj" />
-  	<ProjectReference Include="D:\projects\p3rpc.commonmodutils\p3rpc.commonmodutils\p3rpc.commonmodutils.csproj" />
     <ProjectReference Include="..\..\UE.Toolkit\UE.Toolkit.Interfaces\UE.Toolkit.Interfaces.csproj" />
   </ItemGroup>
 
@@ -52,7 +51,7 @@
     <PackageReference Include="Reloaded.Mod.Interfaces" Version="2.4.0" ExcludeAssets="runtime" />
     <PackageReference Include="Reloaded.SharedLib.Hooks" Version="1.9.0" />
     <PackageReference Include="SharedScans.Interfaces" Version="1.2.0" />
-    <!--<PackageReference Include="p3rpc.commonmodutils" Version="1.8.0" />-->
+    <PackageReference Include="p3rpc.commonmodutils" Version="1.8.0" />
     <!--<PackageReference Include="UE.Toolkit.Interfaces" Version="1.4.5" />-->
   </ItemGroup>
 

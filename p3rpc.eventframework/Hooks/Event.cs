@@ -7,6 +7,7 @@ using Reloaded.Hooks.Definitions.X64;
 using UE.Toolkit.Core.Types;
 using UE.Toolkit.Core.Types.Unreal.UE5_4_4;
 using HashableInt = UE.Toolkit.Core.Types.Unreal.UE5_4_4.HashableInt;
+using UWorld = p3rpc.nativetypes.Interfaces.UWorld;
 
 namespace p3rpc.eventframework.Hooks
 {
