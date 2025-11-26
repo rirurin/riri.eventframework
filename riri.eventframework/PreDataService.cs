@@ -55,19 +55,6 @@ namespace riri.eventframework
 
         public unsafe PreDataService(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context, modules)
         {
-            _context._toolkitObjects.OnObjectLoadedByName<UObject>("BustupExistDataAsset", x =>
-            {
-                var CurrentDict = new TMapDynamicDictionary<HashableInt8>(
-                    (UE.Toolkit.Core.Types.Unreal.UE5_4_4.TMap<HashableInt8, byte>*)((nint)x.Self + 0x30),
-                    typeof(FBustupFace),
-                    _context._toolkitMemory);
-                _context._utils.Log($"BustupExistDataAsset: 0x{(nint)x.Self:x}");
-                _context._utils.Log($"Entries: {CurrentDict.Count}");
-                if (CurrentDict.TryGetValue(new HashableInt8(1), out var chara))
-                {
-                    _context._utils.Log($"Got entry 1: 0x{chara:x}");
-                }
-            });
         }
 
         public override void Register()
@@ -86,7 +73,11 @@ namespace riri.eventframework
             TArrayList<FString> dst = new(_context._toolkitMemory);
             dst.ResizeTo(src.ArrayMax);
             foreach (var Level in src)
-                dst.AddValue(*(FString*)_context._toolkitObjects.CreateFString(Level.Value->ToString()));
+            {
+                var fLevel = (FString*)_context._toolkitObjects.CreateFString(Level.Value->ToString()); 
+                dst.AddValue(*fLevel);
+                _context._toolkitMemory.Free((nint)fLevel);
+            }
             dst.Leak();
             return dst;
         }
@@ -99,14 +90,20 @@ namespace riri.eventframework
                 var BgLevelList = new TArrayList<FString>((UE.Toolkit.Core.Types.Unreal.UE5_4_4.TArray<FString>*)(&Level.Value->EventBGLevels), _context._toolkitMemory);
                 var BgLevelListOut = CopySublevelsBGLevels(BgLevelList);
                 
+                var fBGFieldSeasonSubLevel =
+                    (FString*)_context._toolkitObjects.CreateFString(Level.Value->BGFieldSeasonSubLevel.ToString());
+                var fBGFieldSoundSubLevel =
+                    (FString*)_context._toolkitObjects.CreateFString(Level.Value->BGFieldSoundSubLevel.ToString());
                 dst.AddValue(new()
                 {
                     EventBGLevels = *(p3rpc.nativetypes.Interfaces.TArray<FString>*)BgLevelListOut.Base(),
                     BGFieldMajorID = Level.Value->BGFieldMajorID,
                     BGFieldMinorID = Level.Value->BGFieldMinorID,
-                    BGFieldSeasonSubLevel = *(FString*)_context._toolkitObjects.CreateFString(Level.Value->BGFieldSeasonSubLevel.ToString()),
-                    BGFieldSoundSubLevel = *(FString*)_context._toolkitObjects.CreateFString(Level.Value->BGFieldSoundSubLevel.ToString())
+                    BGFieldSeasonSubLevel = *fBGFieldSeasonSubLevel,
+                    BGFieldSoundSubLevel = *fBGFieldSoundSubLevel
                 });
+                _context._toolkitMemory.Free((nint)fBGFieldSeasonSubLevel);
+                _context._toolkitMemory.Free((nint)fBGFieldSoundSubLevel);
                 _context._toolkitMemory.Free((nint)BgLevelListOut.Base());
             }
         }
@@ -125,7 +122,9 @@ namespace riri.eventframework
             {
                 true => (FString*)hook.EventLevel, false => &original->EventLevel
             };
-            copy->EventLevel = *(FString*)_context._toolkitObjects.CreateFString(EventLevelSource->ToString());
+            var fEventLevel = (FString*)_context._toolkitObjects.CreateFString(EventLevelSource->ToString());
+            copy->EventLevel = *fEventLevel;
+            _context._toolkitMemory.Free((nint)fEventLevel);
             // Set Event Sublevels
             var EventSublevelSrc = (hook is { EventSublevels: not null }) switch
             {

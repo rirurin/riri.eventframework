@@ -48,12 +48,13 @@ namespace p4rpc.eventframework
             var toolkitObjects = utils.GetDependencyEx<IUnrealObjects>("Object Interface (UE Toolkit)");
             var toolkitMemory = utils.GetDependencyEx<IUnrealMemory>("Memory Interface (UE Toolkit)");
             var toolkitStrings = utils.GetDependencyEx<IUnrealStrings>("String Interface (UE Toolkit)");
+            var toolkitState = utils.GetDependencyEx<IUnrealState>("Unreal State (UE Toolkit");
 
             _context = new(
                 baseAddress, _configuration, _logger, startupScanner, _hooks,
                 _modLoader.GetDirectoryForModId(_modConfig.ModId), utils,
                 new Memory(), sharedScans, _modConfig.ModId,
-                toolkitStrings, toolkitObjects, toolkitMemory);
+                toolkitStrings, toolkitObjects, toolkitMemory, toolkitState);
             _runtime = new(_context);
 
             _runtime.AddModule<PreDataService>();

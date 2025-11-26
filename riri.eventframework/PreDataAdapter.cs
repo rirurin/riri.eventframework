@@ -103,16 +103,26 @@ namespace riri.eventframework
                 TArrayList<FString> BgLevels = new(_memory);
                 BgLevels.ResizeTo(Sublevel.EventBGLevels.Count);
                 foreach (var Level in Sublevel.EventBGLevels)
-                    BgLevels.AddValue(*_objects.CreateFString(Level));
+                {
+                    var fBgLevel = _objects.CreateFString(Level);
+                    BgLevels.AddValue(*fBgLevel);
+                    _memory.Free((nint)fBgLevel);
+                }
                 BgLevels.Leak();
-                Sublevels.AddValue(new FAtlEvtPreSublevelData()
+                var fBGFieldSeasonSubLevel =
+                    (p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSeasonSubLevel!);
+                var fBGFieldSoundSubLevel =
+                    (p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSoundSubLevel!);
+                Sublevels.AddValue(new FAtlEvtPreSublevelData
                 {
                     EventBGLevels = *(p3rpc.nativetypes.Interfaces.TArray<p3rpc.nativetypes.Interfaces.FString>*)BgLevels.Base(),
                     BGFieldMajorID = Sublevel.BGFieldMajorID,
                     BGFieldMinorID = Sublevel.BGFieldMinorID,
-                    BGFieldSeasonSubLevel = *(p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSeasonSubLevel!),
-                    BGFieldSoundSubLevel = *(p3rpc.nativetypes.Interfaces.FString*)_objects.CreateFString(Sublevel.BGFieldSoundSubLevel!),
+                    BGFieldSeasonSubLevel = *fBGFieldSeasonSubLevel,
+                    BGFieldSoundSubLevel = *fBGFieldSoundSubLevel,
                 });
+                _memory.Free((nint)fBGFieldSeasonSubLevel);
+                _memory.Free((nint)fBGFieldSoundSubLevel);
                 _memory.Free((nint)BgLevels.Base());
             }
             return Sublevels;
