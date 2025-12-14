@@ -9,10 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "riri.eventframework", "riri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "p4rpc.eventframework", "p4rpc.eventframework\p4rpc.eventframework.csproj", "{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UE.Toolkit.Interfaces", "..\UE.Toolkit\UE.Toolkit.Interfaces\UE.Toolkit.Interfaces.csproj", "{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UE.Toolkit.Core", "..\UE.Toolkit\UE.Toolkit.Core\UE.Toolkit.Core.csproj", "{960C712E-0BF6-40DA-8795-D6188949C758}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,14 +27,6 @@ Global
 		{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC6B173A-7EAE-41B0-967A-06EA9FA1C2F1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{960C712E-0BF6-40DA-8795-D6188949C758}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{960C712E-0BF6-40DA-8795-D6188949C758}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{960C712E-0BF6-40DA-8795-D6188949C758}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{960C712E-0BF6-40DA-8795-D6188949C758}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

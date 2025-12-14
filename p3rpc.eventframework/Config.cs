@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel;
 using p3rpc.eventframework.Template.Configuration;
-using Reloaded.Mod.Interfaces.Structs;
+using RyoTune.Reloaded;
 
 namespace p3rpc.eventframework.Configuration
 {
     public class Config : Configurable<Config>
     {
+        [DisplayName("Log Level")]
+        [DefaultValue(LogLevel.Information)]
+        public LogLevel LogLevel { get; set; } = LogLevel.Information;
     }
 
     /// <summary>

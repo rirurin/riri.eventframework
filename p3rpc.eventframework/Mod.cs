@@ -9,6 +9,8 @@ using Reloaded.Mod.Interfaces.Internal;
 using riri.eventframework;
 using SharedScans.Interfaces;
 using System.Diagnostics;
+using RyoTune.Reloaded;
+using UE.Toolkit.Core.Types.Unreal.Factories;
 using UE.Toolkit.Interfaces;
 
 namespace p3rpc.eventframework
@@ -40,25 +42,28 @@ namespace p3rpc.eventframework
             if (process?.MainModule == null) throw new Exception($"[{_modConfig.ModName}] Process is null");
             var baseAddress = process.MainModule.BaseAddress;
             if (_hooks == null) throw new Exception($"[{_modConfig.ModName}] Could not get controller for Reloaded hooks");
+            var logColor = System.Drawing.Color.PaleTurquoise;
+            Project.Initialize(_modConfig, _modLoader, _logger, logColor, true);
+            Log.LogLevel = _configuration.LogLevel;
             var startupScanner = Utils.GetDependency<IStartupScanner>(_modLoader, _modConfig.ModName, "Reloaded Startup Scanner");
-            Utils utils = Utils.Create(_modLoader, startupScanner, _logger, _hooks, baseAddress, _modConfig.ModName, System.Drawing.Color.PaleTurquoise);
+            var utils = Utils.Create(_modLoader, startupScanner, _logger, _hooks, baseAddress, _modConfig.ModName, logColor);
 
             var sharedScans = utils.GetDependencyEx<ISharedScans>("Shared Scans");
             var toolkitObjects = utils.GetDependencyEx<IUnrealObjects>("Object Interface (UE Toolkit)");
             var toolkitMemory = utils.GetDependencyEx<IUnrealMemory>("Memory Interface (UE Toolkit)");
             var toolkitStrings = utils.GetDependencyEx<IUnrealStrings>("String Interface (UE Toolkit)");
-            var toolkitState = utils.GetDependencyEx<IUnrealState>("Unreal State (UE Toolkit");
+            var toolkitState = utils.GetDependencyEx<IUnrealState>("Unreal State (UE Toolkit)");
+            var toolkitFactory = utils.GetDependencyEx<IUnrealFactory>("Factory (UE Toolkit)");
 
             _context = new(
                 baseAddress, _configuration, _logger, startupScanner, _hooks,
                 _modLoader.GetDirectoryForModId(_modConfig.ModId), utils,
                 new Memory(), sharedScans, _modConfig.ModId,
-                toolkitStrings, toolkitObjects, toolkitMemory, toolkitState);
+                toolkitStrings, toolkitObjects, toolkitMemory, toolkitState, toolkitFactory);
             _runtime = new(_context);
             _runtime.AddModule<Hooks.Event>();
             _runtime.AddModule<Hooks.Field>();
             _runtime.AddModule<PreDataService>();
-            _runtime.AddModule<PreDataAdapterFactory>();
             _runtime.RegisterModules();
             _runtime.GetModule<PreDataService>()._game = new GameMethods();
 

@@ -1,7 +1,7 @@
 {
   "ModId": "p3rpc.eventframework",
   "ModName": "P3RE Event Framework",
-  "ModAuthor": "RIrurin",
+  "ModAuthor": "Rirurin",
   "ModVersion": "1.0.0",
   "ModDescription": "Allow for customization of existing events and addition of new events in Persona 3 Reload",
   "ModDll": "p3rpc.eventframework.dll",
@@ -12,7 +12,93 @@
   "ModNativeDll64": "",
   "IsLibrary": true,
   "ReleaseMetadataFileName": "p3rpc.eventframework.ReleaseMetadata.json",
-  "PluginData": {},
+  "PluginData": {
+    "GameBananaDependencies": {
+      "IdToConfigMap": {
+        "p3rpc.essentials": {
+          "Config": {
+            "ItemType": "Mod",
+            "ItemId": 494020
+          },
+          "ReleaseMetadataName": "p3rpc.essentials.ReleaseMetadata.json"
+        },
+        "SharedScans.Reloaded": {
+          "Config": {
+            "ItemType": "Mod",
+            "ItemId": 495507
+          },
+          "ReleaseMetadataName": "SharedScans.Reloaded.ReleaseMetadata.json"
+        }
+      }
+    },
+    "GitHubDependencies": {
+      "IdToConfigMap": {
+        "p3rpc.essentials": {
+          "Config": {
+            "UserName": "AnimatedSwine37",
+            "RepositoryName": "p3rpc.essentials",
+            "UseReleaseTag": true,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "p3rpc.essentials.ReleaseMetadata.json"
+        },
+        "p3rpc.nativetypes": {
+          "Config": {
+            "UserName": "Rirurin",
+            "RepositoryName": "p3rpc.nativetypes",
+            "UseReleaseTag": true,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "p3rpc.nativetypes.ReleaseMetadata.json"
+        },
+        "Reloaded.Memory.SigScan.ReloadedII": {
+          "Config": {
+            "UserName": "Reloaded-Project",
+            "RepositoryName": "Reloaded.Memory.SigScan",
+            "UseReleaseTag": false,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "Reloaded.Memory.SigScan.ReloadedII.ReleaseMetadata.json"
+        },
+        "reloaded.sharedlib.hooks": {
+          "Config": {
+            "UserName": "Sewer56",
+            "RepositoryName": "Reloaded.SharedLib.Hooks.ReloadedII",
+            "UseReleaseTag": true,
+            "AssetFileName": "reloaded.sharedlib.hooks.zip"
+          },
+          "ReleaseMetadataName": "Sewer56.Update.ReleaseMetadata.json"
+        },
+        "UE.Toolkit.Reloaded": {
+          "Config": {
+            "UserName": "RyoTune",
+            "RepositoryName": "UE.Toolkit",
+            "UseReleaseTag": true,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "UE.Toolkit.Reloaded.ReleaseMetadata.json"
+        },
+        "UE.Toolkit.Reloaded": {
+          "Config": {
+            "UserName": "RyoTune",
+            "RepositoryName": "UE.Toolkit",
+            "UseReleaseTag": true,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "UE.Toolkit.Reloaded.ReleaseMetadata.json"
+        },
+        "P3R.UEToolkit": {
+          "Config": {
+            "UserName": "RyoTune",
+            "RepositoryName": "P3R.UEToolkit",
+            "UseReleaseTag": true,
+            "AssetFileName": "Mod.zip"
+          },
+          "ReleaseMetadataName": "P3R.UEToolkit.ReleaseMetadata.json"
+        }
+      }
+    }
+  },
   "IsUniversalMod": false,
   "ModDependencies": [
     "P3R.UEToolkit",
