@@ -93,7 +93,7 @@ jobs:
       if: env.IS_RELEASE == 'true'
       with:
         # Path to load note-worthy description of changes in release from
-        body_path: ${{ env.PUBLISH_BASE }}/${{ env.PUBLISH_CHANGELOG_PATH }}
+        body_path: ${{ env.PUBLISH_CHANGELOG_PATH }}
         # Newline-delimited list of path globs for asset files to upload
         files: |
           ${{ env.PUBLISH_BASE }}/${{ env.P3R_PATH }}/${{ env.PUBLISH_GITHUB_PATH }}/*
