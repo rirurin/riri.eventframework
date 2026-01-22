@@ -29,8 +29,12 @@ namespace riri.eventframework
             string EventsPath = Path.Join(modPath, _game!.GetCinemaBasePath());
             if (!Path.Exists(EventsPath)) return;
             var preEvtFiles = Directory.EnumerateFiles(EventsPath, "*.*", SearchOption.AllDirectories).Where(
-                x => Constants.YAML_EXTENSION.Contains(Path.GetExtension(x)[1..]) && TryRegisterPreEventYaml(x)
-            );
+                x =>
+                {
+                    var Extension = Path.GetExtension(x);
+                    if (Extension == string.Empty) return false;
+                    return Constants.YAML_EXTENSION.Contains(Extension[1..]) && TryRegisterPreEventYaml(x);
+                });
             foreach (var preEvtFile in preEvtFiles)
             {
                 // Get params stored in yml file, then generate anything that can be implied from file name
