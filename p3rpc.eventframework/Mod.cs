@@ -61,6 +61,7 @@ namespace p3rpc.eventframework
                 new Memory(), sharedScans, _modConfig.ModId,
                 toolkitStrings, toolkitObjects, toolkitMemory, toolkitState, toolkitFactory);
             _runtime = new(_context);
+            _runtime.AddModule<Hooks.Common>();
             _runtime.AddModule<Hooks.Event>();
             _runtime.AddModule<Hooks.Field>();
             _runtime.AddModule<PreDataService>();

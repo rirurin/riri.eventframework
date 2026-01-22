@@ -78,15 +78,6 @@
           },
           "ReleaseMetadataName": "UE.Toolkit.Reloaded.ReleaseMetadata.json"
         },
-        "UE.Toolkit.Reloaded": {
-          "Config": {
-            "UserName": "RyoTune",
-            "RepositoryName": "UE.Toolkit",
-            "UseReleaseTag": true,
-            "AssetFileName": "Mod.zip"
-          },
-          "ReleaseMetadataName": "UE.Toolkit.Reloaded.ReleaseMetadata.json"
-        },
         "P3R.UEToolkit": {
           "Config": {
             "UserName": "RyoTune",

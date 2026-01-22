@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using p3rpc.commonmodutils;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X64;
@@ -90,19 +91,81 @@ public class Field : ModuleBase<EventContext>
             NewLevels.Remove(LevelPath, out _);
         }
     }
+    
+    [StructLayout(LayoutKind.Sequential)]
+    public unsafe struct FCmmExistAvailablity
+    {
+        /*
+        // Old definitions
+        private uint OkFlag; // NpcBitflag
+        private uint PreOpenFlag;
+        private uint Field8;
+        private uint NGPlusFlag; // SysHoliday
+        private uint Field10; // NationalHoliday
+        private uint Field14;
+        */
+        internal fixed uint OkFlags[3];
+        internal fixed uint PlayFlags[3];
+        internal fixed byte IsAvailableOnDay[365];       
+    }
+
+    // In AF_FldBinaryData.arc
+    [StructLayout(LayoutKind.Sequential, Size = 0x314)]
+    public struct FCmmExistEntry
+    {
+        internal ushort Arcana;
+        internal FCmmExistAvailablity Cmm;
+        internal FCmmExistAvailablity Normal;
+    }
+
+    public enum EFldCmmNpcType : byte
+    {
+        Cmm = 0,
+        Normal = 1,
+    }
    
     private SHFunction<AFldCmmActor_CheckExistSpawnActor> _checkExistSpawnActor;
-    public unsafe delegate int AFldCmmActor_CheckExistSpawnActor(TArray<nint>* cmmExist, short uniqId, byte mType, int daysPassed);
+    public unsafe delegate int AFldCmmActor_CheckExistSpawnActor(TArray<FCmmExistEntry>* cmmExist, short uniqId, EFldCmmNpcType mType, int daysPassed);
 
-    private unsafe int AFldCmmActor_CheckExistSpawnActorImpl(TArray<nint>* cmmExist, short uniqId, byte mType, int daysPassed)
+    // Values != 1 will destroy the actor
+    private unsafe int AFldCmmActor_CheckExistSpawnActorImpl(TArray<FCmmExistEntry>* cmmExist, short uniqId, EFldCmmNpcType mType, int daysPassed)
     {
-        // TODO: Write proper logic for this
+        var GWork = _common.GetUGlobalWorkEx();
+        var Entries = new TArrayList<FCmmExistEntry>(cmmExist, _context._toolkitMemory);
+        foreach (var Entry in Entries)
+        {
+            if (Entry.Value->Arcana != uniqId) continue;
+            var Available = mType switch
+            {
+                EFldCmmNpcType.Cmm => &Entry.Value->Cmm,
+                EFldCmmNpcType.Normal => &Entry.Value->Normal
+            };
+            // For PlayFlags, check that any flag that exists and is false
+            // For OkFlags, check that all flags that exists is false
+            for (var i = 0; i < 3; i++)
+            {
+                var PlayFlag = Available->PlayFlags[i];
+                if (PlayFlag == uint.MaxValue || GWork.GetBitflag(PlayFlag)) continue;
+                for (var j = 0; j < 3; j++)
+                {
+                    var OkFlag = Available->OkFlags[j];
+                    // Log.Debug($"[AFldCmmActor::CheckExistSpawnActor]: OK_FLAG(0x{OkFlag:x})");
+                    if (OkFlag == uint.MaxValue)
+                    {
+                        Log.Debug($"[AFldCmmActor::CheckExistSpawnActor] Availability for {mType}:{uniqId} on day {daysPassed} = {Available->IsAvailableOnDay[daysPassed]}");
+                        return Available->IsAvailableOnDay[daysPassed];
+                    }
+
+                    if (GWork.GetBitflag(OkFlag)) return -1;
+                }
+            }
+            return -1;
+        }
         return 1;
-        //_checkExistSpawnActor.OriginalFunction(cmmExist, uniqId, mType, daysPassed);
-    
     }
     
     public ConcurrentDictionary<string, nint> NewLevels = new();
+    private Common _common;
     
     public unsafe Field(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context,
         modules)
@@ -119,5 +182,6 @@ public class Field : ModuleBase<EventContext>
     }
     public override void Register()
     {
-    }   
+        _common = GetModule<Common>();
+    }
 }
