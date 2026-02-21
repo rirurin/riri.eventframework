@@ -3,6 +3,7 @@
     public interface IGameMethods
     {
         int GetEventCategoryTypeInt(string typeName);
-        string GetCinemaBasePath();
+        string GetCinemaBasePathForUnrealEssentials();
+        string GetCinemaBasePathForUnrealEngine();
     }
 }

@@ -54,12 +54,14 @@ namespace p3rpc.eventframework
             var toolkitStrings = utils.GetDependencyEx<IUnrealStrings>("String Interface (UE Toolkit)");
             var toolkitState = utils.GetDependencyEx<IUnrealState>("Unreal State (UE Toolkit)");
             var toolkitFactory = utils.GetDependencyEx<IUnrealFactory>("Factory (UE Toolkit)");
+            var toolkitSpawning = utils.GetDependencyEx<IUnrealSpawning>("Spawning (UE Toolkit)");
 
             _context = new(
                 baseAddress, _configuration, _logger, startupScanner, _hooks,
                 _modLoader.GetDirectoryForModId(_modConfig.ModId), utils,
                 new Memory(), sharedScans, _modConfig.ModId,
-                toolkitStrings, toolkitObjects, toolkitMemory, toolkitState, toolkitFactory);
+                toolkitStrings, toolkitObjects, toolkitMemory, 
+                toolkitState, toolkitFactory, toolkitSpawning);
             _runtime = new(_context);
             _runtime.AddModule<Hooks.Common>();
             _runtime.AddModule<Hooks.Event>();

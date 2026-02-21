@@ -7,8 +7,10 @@ using Reloaded.Hooks.Definitions.X64;
 using riri.eventframework;
 using RyoTune.Persona3Reload.Types;
 using RyoTune.Reloaded;
+using UE.Toolkit.Core.Types;
 using UE.Toolkit.Core.Types.Unreal.UE5_4_4;
 using FName = UE.Toolkit.Core.Types.Unreal.UE5_4_4.FName;
+using UWorld = p3rpc.nativetypes.Interfaces.UWorld;
 
 namespace p3rpc.eventframework.Hooks;
 
@@ -21,7 +23,39 @@ public class Field : ModuleBase<EventContext>
     // UGameplayStatics::GetStreamingLevel
     public unsafe delegate ULevelStreaming* ULevelStreaming_GetStreamingLevel(UObject* WorldContextObject, FName Name);
     public SHFunction<ULevelStreaming_GetStreamingLevel> _getStreamingLevel;
-
+    
+    private static int GetWorld_Offset;
+    public unsafe delegate UWorld* UObject_GetWorld(nint UObject); // vtable + 0x160
+    
+    /*
+    private unsafe ULevelStreaming* ULevelStreaming_GetStreamingLevelImpl(UObject* WorldContextObject, FName Name)
+    {
+        if (Name.Equals(new FName())) { return null; }
+        var Result = _getStreamingLevel.Hook!.OriginalFunction(WorldContextObject, Name);
+        if (Result == null)
+        {
+            var NameStr = Name.ToString();
+            var AssetPath = $"{NameStr}.{Path.GetFileName(NameStr)}";
+            var getWorld = _context._hooks.CreateWrapper<UObject_GetWorld>(
+                *(nint*)(*(nint*)WorldContextObject + GetWorld_Offset), out _);
+            var World = getWorld((nint)WorldContextObject);
+            var WorldObj = _context._toolkitFactory.CreateUObject((nint)World);
+            var StreamedLevels = new TArrayList<Ptr<ULevelStreaming>>((TArray<Ptr<ULevelStreaming>>*)&World->StreamingLevels, _context._toolkitMemory);
+            var NewLevel = _context._toolkitSpawning.SpawnObject<ULevelStreamingDynamic>(
+                $"LevelStreamingDynamic_{StreamedLevels.Count}", WorldObj);
+            var pNewLevel = (ULevelStreaming*)NewLevel.Ptr;
+            pNewLevel->WorldAsset.SoftObjectPtr.Super.ObjectId.AssetPath.PackageName = new(AssetPath);
+            // *(byte*)((nint)pNewLevel + 0xba) |= 0x20; // Lock Level
+            StreamedLevels.AddValue(new (pNewLevel));
+            LevelStreamingRegistry.Add(AssetPath);
+            Log.Debug($"Added level '{AssetPath}' to the level streaming registry: 0x{(nint)Result:X}");
+            Result = _getStreamingLevel.Hook!.OriginalFunction(WorldContextObject, Name);
+        }
+        Log.Debug($"ULevelStreaming::GetStreamingLevel: {Name.ToString()}: 0x{(nint)Result:X}");
+        return Result;
+    }
+    */
+    
     private unsafe ULevelStreaming* ULevelStreaming_GetStreamingLevelImpl(UObject* WorldContextObject, FName Name)
     {
         if (Name.Equals(new FName())) { return null; }
@@ -92,18 +126,11 @@ public class Field : ModuleBase<EventContext>
         }
     }
     
+    /*
+    // Disabled, not neccessary for now
     [StructLayout(LayoutKind.Sequential)]
     public unsafe struct FCmmExistAvailablity
     {
-        /*
-        // Old definitions
-        private uint OkFlag; // NpcBitflag
-        private uint PreOpenFlag;
-        private uint Field8;
-        private uint NGPlusFlag; // SysHoliday
-        private uint Field10; // NationalHoliday
-        private uint Field14;
-        */
         internal fixed uint OkFlags[3];
         internal fixed uint PlayFlags[3];
         internal fixed byte IsAvailableOnDay[365];       
@@ -163,9 +190,12 @@ public class Field : ModuleBase<EventContext>
         }
         return 1;
     }
+    */
     
     public ConcurrentDictionary<string, nint> NewLevels = new();
     private Common _common;
+    private PreDataService _preDataService;
+    private HashSet<string> LevelStreamingRegistry = new();
     
     public unsafe Field(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context,
         modules)
@@ -173,15 +203,46 @@ public class Field : ModuleBase<EventContext>
         _loadLevelInstance = new();
         _getStreamingLevel = new(ULevelStreaming_GetStreamingLevelImpl);
         _unloadStreamingLevel = new(UGameplayStatics_UnloadStreamLevelImpl);
-        _checkExistSpawnActor = new(AFldCmmActor_CheckExistSpawnActorImpl);
+        // _checkExistSpawnActor = new(AFldCmmActor_CheckExistSpawnActorImpl);
 
         Project.Inis.UsingSetting<int>(Constants.UnrealIniId, "SetShouldBeLoaded", nameof(ULevelStreaming),
             x => SetShouldBeLoaded_Offset = x);
         Project.Inis.UsingSetting<int>(Constants.UnrealIniId, "ShouldBeLoaded", nameof(ULevelStreaming),
-            x => ShouldBeLoaded_Offset = x);       
+            x => ShouldBeLoaded_Offset = x);
+        Project.Inis.UsingSetting<int>(Constants.UnrealIniId, "GetWorld", nameof(UObject),
+            x => GetWorld_Offset = x);
+        
+        _context._toolkitObjects.OnObjectLoadedByName<UWorld>("LV_Xrd777_P", x =>
+        {
+            var World = x.Self;
+            var WorldObj = _context._toolkitFactory.CreateUObject((nint)World);
+            var StreamedLevels = new TArrayList<Ptr<ULevelStreaming>>((TArray<Ptr<ULevelStreaming>>*)&World->StreamingLevels, _context._toolkitMemory);
+
+            foreach (var Level in StreamedLevels)
+            {
+                var StreamingLevelPtr = Level.Value->Value;
+                var PackageName = StreamingLevelPtr->WorldAsset.SoftObjectPtr.Super.ObjectId.AssetPath.PackageName.ToString();
+                LevelStreamingRegistry.Add(PackageName);
+            }
+            var OldLength = StreamedLevels.Count;
+            foreach (var EditedLevelPackage in _preDataService.CachedLevelPackages)
+            {
+                // This is only required for new events that don't exist in the registry, not events that have modified pre data
+                if (LevelStreamingRegistry.Contains(EditedLevelPackage)) continue;
+                Log.Debug($"Caching event level with package ID '{EditedLevelPackage}'");
+                var NewLevel = _context._toolkitSpawning.SpawnObject<ULevelStreamingDynamic>(
+                    $"LevelStreamingDynamic_{StreamedLevels.Count}", WorldObj);
+                var pNewLevel = (ULevelStreaming*)NewLevel.Ptr;
+                pNewLevel->WorldAsset.SoftObjectPtr.Super.ObjectId.AssetPath.PackageName = new(EditedLevelPackage);
+                *(byte*)((nint)pNewLevel + 0xba) |= 0x20; // Lock Level
+                StreamedLevels.AddValue(new (pNewLevel));
+            }
+            Log.Debug($"Added {StreamedLevels.Count - OldLength} levels into the global registry");
+        });
     }
     public override void Register()
     {
         _common = GetModule<Common>();
+        _preDataService = GetModule<PreDataService>();
     }
 }

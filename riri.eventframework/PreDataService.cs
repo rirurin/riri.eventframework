@@ -10,7 +10,8 @@ namespace riri.eventframework
     {
 
         public IGameMethods? _game { get; set; }
-        public ConcurrentDictionary<uint, PreDataModel> NewPreData = new();
+        public ConcurrentDictionary<uint, PreDataModel> NewPreData { get; } = new();
+        public List<string> CachedLevelPackages { get; } = new();
 
         public PreDataService(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) 
             : base(context, modules) {}
@@ -26,7 +27,7 @@ namespace riri.eventframework
 
         public void OnModLoaded(string modPath)
         {
-            string EventsPath = Path.Join(modPath, _game!.GetCinemaBasePath());
+            string EventsPath = Path.Join(modPath, _game!.GetCinemaBasePathForUnrealEssentials());
             if (!Path.Exists(EventsPath)) return;
             var preEvtFiles = Directory.EnumerateFiles(EventsPath, "*.*", SearchOption.AllDirectories).Where(
                 x =>
@@ -41,7 +42,11 @@ namespace riri.eventframework
                 // Params can be null if they're an event hook. New events must have all parameters defined to be accepted on GetEvtPreData
                 _context._utils.Log($"Reading file {preEvtFile}");
                 var preDataManaged = Serializer.deserializer.Deserialize<PreDataModel>(new StreamReader(preEvtFile));
-                if (preDataManaged == null) { continue; }
+                var eventFileNameParts = Path.GetFileNameWithoutExtension(preEvtFile).Split("_", 2);
+                if (preDataManaged == null || eventFileNameParts.Length != 2) { continue; }
+                var eventNameBase = eventFileNameParts[1];
+                var eventLevelName = $"LV_{eventNameBase}";
+                CachedLevelPackages.Add($"/{_game.GetCinemaBasePathForUnrealEngine()}/{eventNameBase}/{eventLevelName}.{eventLevelName}");
                 var preFileNameParts = Path.GetFileNameWithoutExtension(preEvtFile).Split("_"); // PRE_Event_Cmmu_120_100_C
                                                                                                      // [0]  [1]  [2]  [3] [4] [5]
                 preDataManaged.EventMajorID = int.Parse(preFileNameParts[3]);

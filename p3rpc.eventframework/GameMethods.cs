@@ -4,8 +4,11 @@ namespace p3rpc.eventframework
 {
     internal class GameMethods : IGameMethods
     {
-        public string GetCinemaBasePath()
+        public string GetCinemaBasePathForUnrealEssentials()
             => Path.Join("UnrealEssentials", "P3R", "Content", "Xrd777", "Events", "Cinema");
+
+        public string GetCinemaBasePathForUnrealEngine()
+            => $"Game/Xrd777/Events/Cinema";
 
         public int GetEventCategoryTypeInt(string typeName)
             => typeName switch
