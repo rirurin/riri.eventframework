@@ -58,8 +58,4 @@
     <PackageReference Include="UE.Toolkit.Interfaces" Version="1.6.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Project\p4rpc.eventframework\" />
-  </ItemGroup>
-
 </Project>

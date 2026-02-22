@@ -2,7 +2,7 @@
   "ModId": "p3rpc.eventframework",
   "ModName": "P3RE Event Framework",
   "ModAuthor": "Rirurin",
-  "ModVersion": "1.0.0",
+  "ModVersion": "1.1.0",
   "ModDescription": "Allow for customization of existing events and addition of new events in Persona 3 Reload",
   "ModDll": "p3rpc.eventframework.dll",
   "ModIcon": "Preview.png",

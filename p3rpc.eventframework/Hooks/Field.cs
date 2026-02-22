@@ -14,7 +14,8 @@ using UWorld = p3rpc.nativetypes.Interfaces.UWorld;
 
 namespace p3rpc.eventframework.Hooks;
 
-public class Field : ModuleBase<EventContext>
+// ReSharper disable once ClassNeverInstantiated.Global
+internal class Field : ModuleBase<EventContext>
 {
     [Function(CallingConventions.Microsoft)]
     public unsafe delegate ULevelStreaming* ULevelStreamingDynamic_LoadLevelInstance(UObject* WorldContextObject, FString* LevelName, FVector* Location, FRotator* Rotation, byte* bOutSuccess, FString* OptionalLevelNameOverride);

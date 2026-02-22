@@ -67,6 +67,7 @@ namespace p3rpc.eventframework
             _runtime.AddModule<Hooks.Event>();
             _runtime.AddModule<Hooks.Field>();
             _runtime.AddModule<PreDataService>();
+            _runtime.AddModule<Hooks.SkipAll>();
             _runtime.RegisterModules();
             _runtime.GetModule<PreDataService>()._game = new GameMethods();
 

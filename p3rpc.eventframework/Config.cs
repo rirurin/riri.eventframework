@@ -6,9 +6,15 @@ namespace p3rpc.eventframework.Configuration
 {
     public class Config : Configurable<Config>
     {
+        [Category("Debug")]
         [DisplayName("Log Level")]
         [DefaultValue(LogLevel.Information)]
         public LogLevel LogLevel { get; set; } = LogLevel.Information;
+        
+        [Category("Debug")]
+        [DisplayName("Can Skip any Event")]
+        [DefaultValue(false)]
+        public bool CanSkipAnyEvent { get; set; } = false;
     }
 
     /// <summary>
