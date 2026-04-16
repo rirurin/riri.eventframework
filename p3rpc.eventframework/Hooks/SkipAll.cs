@@ -24,8 +24,16 @@ internal struct FBustupDrawParam
 // ReSharper disable once ClassNeverInstantiated.Global
 internal class SkipAll : ModuleBase<EventContext>
 {
+    
+    private string[] UBustupDraw_SetObjectPointers_SIG =
+    [
+        "48 89 74 24 ?? 57 48 83 EC 20 4C 8B 41 ?? 48 89 CF",
+        "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 40 49 8B F8 48 85 D2",
+    ];
+    
     private unsafe delegate void UBustupDraw_SetObjectPointers(UBustupDraw* This);
-    private SHFunction<UBustupDraw_SetObjectPointers> _UBustupDraw_SetObjectPointers;
+    private UBustupDraw_SetObjectPointers? _UBustupDraw_SetObjectPointers;
+    private MultiSignature _UBustupDraw_SetObjectPointers_MS;
     
     public unsafe delegate void AAtlEvtEventManager_Tick(AAtlEvtEventManager* This, float Delta);
     private IHook<AAtlEvtEventManager_Tick>? _evtEventManagerTick;
@@ -47,7 +55,7 @@ internal class SkipAll : ModuleBase<EventContext>
                 Param->CharaId = 0;
                 Param->ExprId = 0;
                 Param->CostumeId = 0;
-                _UBustupDraw_SetObjectPointers.Wrapper(BustupDraw);
+                _UBustupDraw_SetObjectPointers!(BustupDraw);
                 *pState = 4;   
             }
         }
@@ -58,7 +66,11 @@ internal class SkipAll : ModuleBase<EventContext>
     
     public unsafe SkipAll(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context, modules)
     {
-        _UBustupDraw_SetObjectPointers = new();
+        _UBustupDraw_SetObjectPointers_MS = new();
+        _context._utils.MultiSigScan(UBustupDraw_SetObjectPointers_SIG,
+            "UAtlEvtSubsystem::DoesLevelStreamingLevelExist", _context._utils.GetDirectAddress, 
+            x => _UBustupDraw_SetObjectPointers = _context._utils.MakeWrapper<UBustupDraw_SetObjectPointers>(x), 
+            _UBustupDraw_SetObjectPointers_MS);
         Project.Inis.UsingSetting<int>(Constants.UnrealIniId, "Tick", nameof(AActor),
             x => Tick_Offset = x);
         // UBlueprintGeneratedClass

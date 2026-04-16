@@ -194,8 +194,8 @@ internal class Field : ModuleBase<EventContext>
     */
     
     public ConcurrentDictionary<string, nint> NewLevels = new();
-    private Common _common;
-    private PreDataService _preDataService;
+    private Common? _common;
+    private PreDataService? _preDataService;
     private HashSet<string> LevelStreamingRegistry = new();
     
     public unsafe Field(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context,
@@ -226,7 +226,7 @@ internal class Field : ModuleBase<EventContext>
                 LevelStreamingRegistry.Add(PackageName);
             }
             var OldLength = StreamedLevels.Count;
-            foreach (var EditedLevelPackage in _preDataService.CachedLevelPackages)
+            foreach (var EditedLevelPackage in _preDataService!.CachedLevelPackages)
             {
                 // This is only required for new events that don't exist in the registry, not events that have modified pre data
                 if (LevelStreamingRegistry.Contains(EditedLevelPackage)) continue;
