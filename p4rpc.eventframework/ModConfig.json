@@ -2,7 +2,7 @@
   "ModId": "p4rpc.eventframework",
   "ModName": "P4R Event Framework",
   "ModAuthor": "Rirurin",
-  "ModVersion": "1.0.0",
+  "ModVersion": "1.1.1",
   "ModDescription": "Allows for customization of existing events and addition of new events in Persona 4 Revival",
   "ModDll": "p4rpc.eventframework.dll",
   "ModIcon": "Preview.png",
@@ -13,6 +13,12 @@
   "IsLibrary": true,
   "ReleaseMetadataFileName": "p4rpc.eventframework.ReleaseMetadata.json",
   "PluginData": {
+    "GitHubRelease": {
+      "UserName": "Rirurin",
+      "RepositoryName": "riri.eventframework",
+      "UseReleaseTag": true,
+      "AssetFileName": "Mod.zip"
+    },
     "GameBananaDependencies": {
       "IdToConfigMap": {
         "p3rpc.essentials": {

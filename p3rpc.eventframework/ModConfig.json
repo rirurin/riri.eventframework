@@ -13,6 +13,12 @@
   "IsLibrary": true,
   "ReleaseMetadataFileName": "p3rpc.eventframework.ReleaseMetadata.json",
   "PluginData": {
+    "GitHubRelease": {
+      "UserName": "Rirurin",
+      "RepositoryName": "riri.eventframework",
+      "UseReleaseTag": true,
+      "AssetFileName": "Mod.zip"
+    },
     "GameBananaDependencies": {
       "IdToConfigMap": {
         "p3rpc.essentials": {
