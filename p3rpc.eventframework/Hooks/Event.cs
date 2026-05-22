@@ -120,7 +120,6 @@ internal class Event : ModuleBase<EventContext>
 
     private unsafe byte UAtlEvtSubsystem_DoesLevelStreamingLevelExistImpl(UAtlEvtSubsystem* self, UWorld* BaseWorld, nativetypes.Interfaces.FString* StreamPath)
     {
-
         var StreamPathStr = StreamPath->ToString();
         _context._utils.Log($"UAtlEvtSubsystem::DoesLevelStreamingLevelExist: {StreamPathStr}");
         var bInExistingLevelList = _doesLevelStreamingExist!.OriginalFunction(self, BaseWorld, StreamPath);
@@ -151,8 +150,14 @@ internal class Event : ModuleBase<EventContext>
     {
         _doesLevelStreamingExistMS = new();
         _context._utils.MultiSigScan(UAtlEvtSubsystem_DoesLevelStreamingLevelExist_SIG,
-            "UAtlEvtSubsystem::DoesLevelStreamingLevelExist", _context._utils.GetDirectAddress, 
-            x => _doesLevelStreamingExist = _context._utils.MakeHooker<UAtlEvtSubsystem_DoesLevelStreamingLevelExist>(UAtlEvtSubsystem_DoesLevelStreamingLevelExistImpl, x), 
+            "UAtlEvtSubsystem::DoesLevelStreamingLevelExist", _context._utils.GetDirectAddress,
+            x =>
+            {
+                _context._utils.Log($"'UAtlEvtSubsystem::DoesLevelStreamingLevelExist' found at: 0x{(nint)x:x}");
+                _doesLevelStreamingExist =
+                    _context._utils.MakeHooker<UAtlEvtSubsystem_DoesLevelStreamingLevelExist>(
+                        UAtlEvtSubsystem_DoesLevelStreamingLevelExistImpl, x);
+            }, 
             _doesLevelStreamingExistMS);
         _context._toolkitObjects.OnObjectLoadedByName<UAtlEvtPreDataAsset>("EvtPreDataAsset", x =>
         {
