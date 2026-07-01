@@ -122,8 +122,12 @@ jobs:
             Write-Host "Could not retrieve the NuGet key, skipping."
             return
         }
-        $Items = Get-ChildItem -Path "$env:PUBLISH_BASE/*.nupkg"
-        dotnet nuget push "$Items" -k "${{ steps.login.outputs.NUGET_API_KEY }}" -s "${{ env.NUGET_URL }}" --skip-duplicate
+        $Items = Get-ChildItem -Path "*.nupkg"
+        Foreach ($Item in $Items)
+        {
+            Write-Host "Pushing $Item"
+            dotnet nuget push "$Item" -k "${{ steps.login.outputs.NUGET_API_KEY }}" -s "${{ env.NUGET_URL }}" --skip-duplicate
+        }
 
     - name: Push Mods to Reloaded NuGet (on Tag)
       env: 
