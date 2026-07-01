@@ -2,6 +2,7 @@
 using Reloaded.Hooks.Definitions;
 using riri.eventframework;
 using Reloaded.Hooks.Definitions.X64;
+using riri.yamlscans.ReloadedII;
 using RyoTune.Persona3Reload.Types;
 using RyoTune.Reloaded;
 using UE.Toolkit.Core.Types.Unreal.UE5_4_4;
@@ -106,23 +107,17 @@ internal class Event : ModuleBase<EventContext>
         Data->DungeonSublevel.EventBGFloorLevel = new (Value.EventBGFloorLevel);
         Data->DungeonSublevel.BGEnvironmentSubLevel = new (Value.BGEnvironmentSubLevel);
     }
-
-    private string[] UAtlEvtSubsystem_DoesLevelStreamingLevelExist_SIG =
-    [
-        "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 40 4C 89 C7",
-        "48 89 5C 24 ?? 48 89 74 24 ?? 57 48 83 EC 40 49 8B F8 48 85 D2",
-    ];
+    
+    private readonly SHFunction2<UAtlEvtSubsystem_DoesLevelStreamingLevelExist> _doesLevelStreamingExist;
     
     [Function(CallingConventions.Microsoft)]
     private unsafe delegate byte UAtlEvtSubsystem_DoesLevelStreamingLevelExist(UAtlEvtSubsystem* self, UWorld* worldOut, nativetypes.Interfaces.FString* pathOut);
-    private IHook<UAtlEvtSubsystem_DoesLevelStreamingLevelExist>? _doesLevelStreamingExist;
-    private MultiSignature _doesLevelStreamingExistMS;
 
     private unsafe byte UAtlEvtSubsystem_DoesLevelStreamingLevelExistImpl(UAtlEvtSubsystem* self, UWorld* BaseWorld, nativetypes.Interfaces.FString* StreamPath)
     {
         var StreamPathStr = StreamPath->ToString();
         _context._utils.Log($"UAtlEvtSubsystem::DoesLevelStreamingLevelExist: {StreamPathStr}");
-        var bInExistingLevelList = _doesLevelStreamingExist!.OriginalFunction(self, BaseWorld, StreamPath);
+        var bInExistingLevelList = _doesLevelStreamingExist.Hook!.OriginalFunction(self, BaseWorld, StreamPath);
         if (bInExistingLevelList == 0 && _field.NewLevels.TryGetValue(StreamPathStr, out _))
             bInExistingLevelList = 1;
         if (bInExistingLevelList == 0)
@@ -148,17 +143,7 @@ internal class Event : ModuleBase<EventContext>
 
     public unsafe Event(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context, modules)
     {
-        _doesLevelStreamingExistMS = new();
-        _context._utils.MultiSigScan(UAtlEvtSubsystem_DoesLevelStreamingLevelExist_SIG,
-            "UAtlEvtSubsystem::DoesLevelStreamingLevelExist", _context._utils.GetDirectAddress,
-            x =>
-            {
-                _context._utils.Log($"'UAtlEvtSubsystem::DoesLevelStreamingLevelExist' found at: 0x{(nint)x:x}");
-                _doesLevelStreamingExist =
-                    _context._utils.MakeHooker<UAtlEvtSubsystem_DoesLevelStreamingLevelExist>(
-                        UAtlEvtSubsystem_DoesLevelStreamingLevelExistImpl, x);
-            }, 
-            _doesLevelStreamingExistMS);
+        _doesLevelStreamingExist = new();
         _context._toolkitObjects.OnObjectLoadedByName<UAtlEvtPreDataAsset>("EvtPreDataAsset", x =>
         {
             var AsObject = _context._toolkitFactory.CreateUObject((nint)x.Self);

@@ -9,13 +9,15 @@ using Reloaded.Mod.Interfaces.Internal;
 using riri.eventframework;
 using SharedScans.Interfaces;
 using System.Diagnostics;
+using riri.eventframework.Interfaces;
+using riri.yamlscans.ReloadedII;
 using RyoTune.Reloaded;
 using UE.Toolkit.Core.Types.Unreal.Factories;
 using UE.Toolkit.Interfaces;
 
 namespace p3rpc.eventframework
 {
-    public class Mod : ModBase
+    public class Mod : ModBase, IExports
     {
         private readonly IModLoader _modLoader;
         private readonly IReloadedHooks? _hooks;
@@ -45,6 +47,7 @@ namespace p3rpc.eventframework
             var logColor = System.Drawing.Color.PaleTurquoise;
             Project.Initialize(_modConfig, _modLoader, _logger, logColor, true);
             Log.LogLevel = _configuration.LogLevel;
+            YamlScans.Initialize(_modConfig, _modLoader);
             var startupScanner = Utils.GetDependency<IStartupScanner>(_modLoader, _modConfig.ModName, "Reloaded Startup Scanner");
             var utils = Utils.Create(_modLoader, startupScanner, _logger, _hooks, baseAddress, _modConfig.ModName, logColor);
 
@@ -68,8 +71,10 @@ namespace p3rpc.eventframework
             _runtime.AddModule<Hooks.Field>();
             _runtime.AddModule<PreDataService>();
             _runtime.AddModule<Hooks.SkipAll>();
+            _runtime.AddModule<Api>();
             _runtime.RegisterModules();
             _runtime.GetModule<PreDataService>()._game = new GameMethods();
+            _modLoader.AddOrReplaceController<IEventFramework>(_owner, _runtime.GetModule<Api>());
 
             _modLoader.OnModLoaderInitialized += OnLoaderInit;
             _modLoader.ModLoading += OnModLoading;
@@ -101,5 +106,7 @@ namespace p3rpc.eventframework
         public Mod() { }
 #pragma warning restore CS8618
         #endregion
+
+        public Type[] GetTypes() => [typeof(IEventFramework)];
     }
 }

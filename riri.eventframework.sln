@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "riri.eventframework", "riri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "p4rpc.eventframework", "p4rpc.eventframework\p4rpc.eventframework.csproj", "{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "riri.eventframework.Interfaces", "riri.eventframework.Interfaces\riri.eventframework.Interfaces.csproj", "{5C101064-CF4D-4EA9-B068-72FD8B72CF98}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F7AC3E3-CEAF-46A7-9967-020805A3F1AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C101064-CF4D-4EA9-B068-72FD8B72CF98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C101064-CF4D-4EA9-B068-72FD8B72CF98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C101064-CF4D-4EA9-B068-72FD8B72CF98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C101064-CF4D-4EA9-B068-72FD8B72CF98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,7 +27,15 @@ namespace riri.eventframework
 
         public void OnModLoaded(string modPath)
         {
-            string EventsPath = Path.Join(modPath, _game!.GetCinemaBasePathForUnrealEssentials());
+            var essentialsPath = Path.Join(modPath, "UnrealEssentials");
+            if (!Path.Exists(essentialsPath)) return;
+            RegisterFolder(essentialsPath);
+        }
+
+        public void RegisterFolder(string modPath)
+        {
+            _context._utils.Log($"RegisterFilesFromFolder: Check for YAML files within {modPath}");
+            var EventsPath = Path.Join(modPath, _game!.GetCinemaBasePathForUnrealEssentials());
             if (!Path.Exists(EventsPath)) return;
             var preEvtFiles = Directory.EnumerateFiles(EventsPath, "*.*", SearchOption.AllDirectories).Where(
                 x =>
@@ -69,7 +77,6 @@ namespace riri.eventframework
                 var preDataHash = UAtlEvtSubsystem.GetEvtPreDataHash((EAtlEvtEventCategoryType)preDataManaged.EventCategoryTypeID, (uint)preDataManaged.EventMajorID, (uint)preDataManaged.EventMinorID);
                 NewPreData.TryAdd(preDataHash, preDataManaged);
                 _context._utils.Log($"Registered pre event yaml {preDataManaged.EventCategory}_{preDataManaged.EventMajorID:D3}_{preDataManaged.EventMinorID:D3}_{preDataManaged.EventRank} (hash: 0x{preDataHash:X})");
-
             }
         }
     }

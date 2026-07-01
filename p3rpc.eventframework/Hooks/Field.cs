@@ -5,9 +5,9 @@ using p3rpc.commonmodutils;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Hooks.Definitions.X64;
 using riri.eventframework;
+using riri.yamlscans.ReloadedII;
 using RyoTune.Persona3Reload.Types;
 using RyoTune.Reloaded;
-using UE.Toolkit.Core.Types;
 using UE.Toolkit.Core.Types.Unreal.UE5_4_4;
 using FName = UE.Toolkit.Core.Types.Unreal.UE5_4_4.FName;
 using UWorld = p3rpc.nativetypes.Interfaces.UWorld;
@@ -18,12 +18,12 @@ namespace p3rpc.eventframework.Hooks;
 internal class Field : ModuleBase<EventContext>
 {
     [Function(CallingConventions.Microsoft)]
-    public unsafe delegate ULevelStreaming* ULevelStreamingDynamic_LoadLevelInstance(UObject* WorldContextObject, FString* LevelName, FVector* Location, FRotator* Rotation, byte* bOutSuccess, FString* OptionalLevelNameOverride);
-    public SHFunction<ULevelStreamingDynamic_LoadLevelInstance>? _loadLevelInstance;
+    private unsafe delegate ULevelStreaming* ULevelStreamingDynamic_LoadLevelInstance(UObject* WorldContextObject, FString* LevelName, FVector* Location, FRotator* Rotation, byte* bOutSuccess, FString* OptionalLevelNameOverride);
+    private readonly SHFunction2<ULevelStreamingDynamic_LoadLevelInstance>? _loadLevelInstance;
     
     // UGameplayStatics::GetStreamingLevel
-    public unsafe delegate ULevelStreaming* ULevelStreaming_GetStreamingLevel(UObject* WorldContextObject, FName Name);
-    public SHFunction<ULevelStreaming_GetStreamingLevel> _getStreamingLevel;
+    private unsafe delegate ULevelStreaming* ULevelStreaming_GetStreamingLevel(UObject* WorldContextObject, FName Name);
+    private readonly SHFunction2<ULevelStreaming_GetStreamingLevel> _getStreamingLevel;
     
     private static int GetWorld_Offset;
     public unsafe delegate UWorld* UObject_GetWorld(nint UObject); // vtable + 0x160
@@ -106,8 +106,8 @@ internal class Field : ModuleBase<EventContext>
     private static int ShouldBeLoaded_Offset;
 
     // UGameplayStatics::UnloadStreamLevel
-    public unsafe delegate void UGameplayStatics_UnloadStreamLevel(UObject* WorldContextObject, FName Name, nint LatentInfo, bool bShouldBlockOnUnload);
-    public SHFunction<UGameplayStatics_UnloadStreamLevel> _unloadStreamingLevel;
+    private unsafe delegate void UGameplayStatics_UnloadStreamLevel(UObject* WorldContextObject, FName Name, nint LatentInfo, bool bShouldBlockOnUnload);
+    private readonly SHFunction2<UGameplayStatics_UnloadStreamLevel> _unloadStreamingLevel;
 
     private unsafe void UGameplayStatics_UnloadStreamLevelImpl(UObject* WorldContextObject, FName Name, nint LatentInfo, bool bShouldBlockOnUnload)
     {
@@ -193,10 +193,10 @@ internal class Field : ModuleBase<EventContext>
     }
     */
     
-    public ConcurrentDictionary<string, nint> NewLevels = new();
+    public readonly ConcurrentDictionary<string, nint> NewLevels = new();
     private Common? _common;
     private PreDataService? _preDataService;
-    private HashSet<string> LevelStreamingRegistry = new();
+    private HashSet<string> LevelStreamingRegistry = [];
     
     public unsafe Field(EventContext context, Dictionary<string, ModuleBase<EventContext>> modules) : base(context,
         modules)
@@ -217,7 +217,7 @@ internal class Field : ModuleBase<EventContext>
         {
             var World = x.Self;
             var WorldObj = _context._toolkitFactory.CreateUObject((nint)World);
-            var StreamedLevels = new TArrayList<Ptr<ULevelStreaming>>((TArray<Ptr<ULevelStreaming>>*)&World->StreamingLevels, _context._toolkitMemory);
+            var StreamedLevels = new TArrayList<UE.Toolkit.Core.Types.Ptr<ULevelStreaming>>((TArray<UE.Toolkit.Core.Types.Ptr<ULevelStreaming>>*)&World->StreamingLevels, _context._toolkitMemory);
 
             foreach (var Level in StreamedLevels)
             {

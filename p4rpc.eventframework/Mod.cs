@@ -9,6 +9,7 @@ using Reloaded.Mod.Interfaces.Internal;
 using riri.eventframework;
 using SharedScans.Interfaces;
 using System.Diagnostics;
+using riri.yamlscans.ReloadedII;
 using RyoTune.Reloaded;
 using UE.Toolkit.Core.Types.Unreal.Factories;
 using UE.Toolkit.Interfaces;
@@ -46,6 +47,7 @@ namespace p4rpc.eventframework
             var logColor = System.Drawing.Color.PaleTurquoise;
             Project.Initialize(_modConfig, _modLoader, _logger, logColor, true);
             Log.LogLevel = _configuration.LogLevel;
+            YamlScans.Initialize(_modConfig, _modLoader);
             var startupScanner = Utils.GetDependency<IStartupScanner>(_modLoader, _modConfig.ModName, "Reloaded Startup Scanner");
             var utils = Utils.Create(_modLoader, startupScanner, _logger, _hooks, baseAddress, _modConfig.ModName, logColor);
 

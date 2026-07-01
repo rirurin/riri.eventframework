@@ -21,6 +21,10 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  id-token: write
+  contents: write
+
 env:
   PUBLISH_BASE: ./Publish
   PUBLISH_GAMEBANANA_PATH: ToUpload/GameBanana
@@ -35,6 +39,7 @@ env:
   RELOADEDIIMODS: .
   RELOADED_TOOLS_PATH: Tools/Reloaded-Tools
 
+  NUGET_URL: https://api.nuget.org/v3/index.json
   # Default value is official Reloaded package server.  
   RELOADED_NUGET_URL: https://packages.sewer56.moe/v3/index.json
 
@@ -64,7 +69,11 @@ jobs:
       with:
         dotnet-version: 9.0.x
 
-    - name: Build
+    - name: Build Interfaces
+      run: |
+        dotnet publish riri.eventframework.Interfaces -c Release --self-contained false -o "$env:PUBLISH_BASE/$env:INTERFACE_PATH" /p:OutputPath=../
+
+    - name: Build Mods
       run: ./PublishAll.ps1
       
     - name: Upload GitHub Release Artifact
@@ -98,7 +107,25 @@ jobs:
         files: |
           ${{ env.PUBLISH_BASE }}/${{ env.P3R_PATH }}/${{ env.PUBLISH_GITHUB_PATH }}/*
 
-    - name: Push to NuGet (on Tag)
+    - name: Login to NuGet (on Tag)
+      uses: NuGet/login@v1
+      if: env.IS_RELEASE == 'true'
+      id: login
+      with:
+        user: ${{ secrets.NUGET_USER }}
+
+    - name: Push Dependencies to NuGet (on Tag)
+      if: env.IS_RELEASE == 'true'
+      run: |
+        if ([string]::IsNullOrEmpty("${{ steps.login.outputs.NUGET_API_KEY }}"))
+        {
+            Write-Host "Could not retrieve the NuGet key, skipping."
+            return
+        }
+        $Items = Get-ChildItem -Path "$env:PUBLISH_BASE/*.nupkg"
+        dotnet nuget push "$Items" -k "${{ steps.login.outputs.NUGET_API_KEY }}" -s "${{ env.NUGET_URL }}" --skip-duplicate
+
+    - name: Push Mods to Reloaded NuGet (on Tag)
       env: 
         RELOADED_NUGET_KEY: ${{ secrets.RELOADED_NUGET_KEY }}
       if: env.IS_RELEASE == 'true'

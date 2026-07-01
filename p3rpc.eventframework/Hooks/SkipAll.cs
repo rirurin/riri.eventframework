@@ -4,6 +4,7 @@ using p3rpc.eventframework.Configuration;
 using Reloaded.Hooks.Definitions;
 using Reloaded.Memory.Extensions;
 using riri.eventframework;
+using riri.yamlscans.ReloadedII;
 using RyoTune.Persona3Reload.Types;
 using RyoTune.Reloaded;
 using UBustupDraw = p3rpc.nativetypes.Interfaces.UBustupDraw;
@@ -25,7 +26,7 @@ internal struct FBustupDrawParam
 internal class SkipAll : ModuleBase<EventContext>
 {
     private unsafe delegate void UBustupDraw_SetObjectPointers(UBustupDraw* This);
-    private SHFunction<UBustupDraw_SetObjectPointers> _UBustupDraw_SetObjectPointers;
+    private SHFunction2<UBustupDraw_SetObjectPointers> _UBustupDraw_SetObjectPointers;
     
     public unsafe delegate void AAtlEvtEventManager_Tick(AAtlEvtEventManager* This, float Delta);
     private IHook<AAtlEvtEventManager_Tick>? _evtEventManagerTick;
