@@ -2,7 +2,7 @@
   "ModId": "p4rpc.eventframework",
   "ModName": "P4R Event Framework",
   "ModAuthor": "Rirurin",
-  "ModVersion": "1.1.2",
+  "ModVersion": "1.2.0",
   "ModDescription": "Allows for customization of existing events and addition of new events in Persona 4 Revival",
   "ModDll": "p4rpc.eventframework.dll",
   "ModIcon": "Preview.png",
